@@ -18,7 +18,11 @@ The google api access token has embeded in the source code, there's no need of *
 2. `> python agent.py`
 
 ## executable binary
-- windows<br>
+- Windows<br>
 `> agent.exe`
-- linux<br>
+- Linux<br>
 `> ./agent`
+
+# feature
+## die
+if the first raw in sheet is **die**, the agent will kill itself.
