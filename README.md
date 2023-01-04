@@ -8,7 +8,7 @@ The C2 agent that using google sheets to control victim host.
 2. `> python agent.py`
 
 ## executable binary
-- windows
+- windows\ 
 `> agent.exe`
-- linux
+- linux\ 
 `> ./agent`
