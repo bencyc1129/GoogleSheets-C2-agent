@@ -25,4 +25,4 @@ The google api access token has embeded in the source code, there's no need of *
 
 # feature
 ## die
-if the first raw in sheet is **die**, the agent will kill itself.
+If the first raw in sheet is **die**, the agent will kill itself.
