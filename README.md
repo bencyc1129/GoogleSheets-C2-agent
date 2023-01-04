@@ -25,4 +25,7 @@ The google api access token has embeded in the source code, there's no need of *
 
 # feature
 ## die
-If the first raw in sheet is **die**, the agent will kill itself.
+If the command is **die**, the agent will kill itself immediately.
+
+## sleep
+If the command is **sleep {sec}**, the agent will update the sleep interval.
