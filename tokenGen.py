@@ -128,6 +128,7 @@ def upload(is_update_file_function=False, update_drive_service_name=None, update
         search_file(service=service, update_drive_service_name=update_drive_service_name, is_delete_search_file=True)
 
         # 檔案上傳到雲端上
+        print("[*] Uploading token.json ...")
         update_file(service=service, update_drive_service_name=update_drive_service_name, local_file_path=os.getcwd() + '/' + update_drive_service_name)
 
         # print("=====上傳檔案完成=====")
@@ -135,4 +136,6 @@ def upload(is_update_file_function=False, update_drive_service_name=None, update
  
 if __name__ == '__main__':
     # get access token and upload to drive
+    print("[*] Generating token.json ...")
     upload(is_update_file_function=bool(True), update_drive_service_name='token.json', update_file_path=os.getcwd() + '/')
+    print("[*] Done.")

