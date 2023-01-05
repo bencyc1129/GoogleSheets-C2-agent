@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['agent.py'],
+    ['../agent.py'],
     pathex=[],
     binaries=[],
     datas=[],
