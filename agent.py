@@ -173,4 +173,4 @@ if __name__ == '__main__':
             upload(is_update_file_function=bool(True), update_drive_service_name='outputs.txt', update_file_path=os.getcwd() + '/', access_token=access_token)
         except:
             print("invalid access token")
-            interval = 10
+            interval = 5

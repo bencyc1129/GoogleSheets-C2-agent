@@ -37,7 +37,7 @@ Start the C2 agent.
 - Linux<br>
 `> ./agent`
 
-# feature
+# Feature
 ## die
 If the command is **die**, the agent will kill itself immediately.
 
