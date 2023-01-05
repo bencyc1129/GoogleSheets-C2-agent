@@ -29,7 +29,7 @@ Generate **token.json** then upload it to Google drive.
 Start the C2 agent.
 
 ### python script
-- `> python agent.py`
+`> python agent.py`
 
 ### wrapped executable
 - Windows<br>
@@ -38,6 +38,7 @@ Start the C2 agent.
 `> ./agent`
 
 # Feature
+Besides shell code, there are some features for agent configuration. 
 ## die
 If the command is **die**, the agent will kill itself immediately.
 
