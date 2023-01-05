@@ -1,6 +1,6 @@
 GoogleSheets-C2-agent
 
-The C2 agent that using google sheets to control victim host.
+The C2 agent that using google sheets to control the victim host.
 
 # Workflow
 1. The attacker edits the sheet file **commands** in **2022CNProject@gmail.com**'s google drive, each line in first column of the sheet is a command.

